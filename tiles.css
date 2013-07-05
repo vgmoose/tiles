@@ -1,0 +1,43 @@
+.highlightit img{
+opacity: 0.5;
+}
+
+.highlightit:hover img{
+opacity: 1;
+
+}
+
+body
+{
+    font-family: helvetica, arial;
+}
+
+#title
+{
+    text-align: center;
+    width: 100%;
+}
+
+#town
+{
+    border-style: dashed ;
+    border-width: 1px;
+    border-color: rgba(0, 0, 0, .5);
+    position: relative;
+    margin-left: -160;
+    left: 50%;
+}
+
+#tileSelect
+{
+    position: relative;
+    left: 50%;
+    margin-left: -528;
+    height: 133px;
+    width: 1056px;
+}
+
+.tile
+{
+    position: absolute;
+}
