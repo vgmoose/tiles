@@ -1,11 +1,55 @@
 var selectedTile = 0;
 var mouseIsDown = false;
+var grid = [];
+
+for(var i=0; i<10; i++) {
+    grid[i] = new Array(9);
+}
+
+function loadData()
+{
+    
+    if (typeof localStorage['grid'] !== 'undefined')
+    {
+        var tmp = localStorage['grid'].split(',');
+        var canvas = document.getElementById("town");
+        
+        
+        for(var x=0; x<9; x++)
+            for (var y=0; y<10; y++)
+            {
+                var p = parseInt(tmp[y*9+x]);
+                
+                if (!isNaN(p))
+                {
+                    grid[x][y] = p;
+                    drawTile(y, x, canvas, p);
+                }
+            }
+    }
+    
+    if (typeof localStorage['selected'] !== 'undefined')
+    {
+        select(localStorage['selected']);
+    }
+
+}
 
 function setAll(a, v) {
     var i, n = a.length;
     for (i = 0; i < n; ++i) {
         a[i].style.opacity = v;
     }
+}
+
+function saveGrid()
+{
+    localStorage['grid'] = grid;
+}
+
+function saveChoice()
+{
+    localStorage['selected'] = selectedTile;
 }
 
 function setMouse(event)
@@ -20,31 +64,37 @@ function download()
     window.open(document.getElementById('town').toDataURL(), "_blank");
 }
 
+function drawTile(val_x, val_y, canvas, tileToDraw)
+{
+    var context = canvas.getContext("2d");
+    
+    var pos = tileToDraw;
+        
+    var pos_x = parseInt(pos%16);
+    var pos_y = parseInt(pos/16);
+    
+    context.drawImage(document.getElementById("tile1"), pos_x*32, (pos_y*32), 32, 32, val_x*32, val_y*32, 32, 32);
+}
+
 function getPosition(event)
 {
     if (mouseIsDown)
     {
         var x = event.x;
         var y = event.y;
-            
-        var canvas = document.getElementById("town");
         
+        var canvas = document.getElementById("town");
+
         x -= canvas.offsetLeft;
         y -= canvas.offsetTop;
-        
+
         var val_x = parseInt(x/32);
         var val_y = parseInt(y/32);
         
-        var context = canvas.getContext("2d");
+        drawTile(val_x, val_y, canvas, selectedTile);
+        grid[val_x][val_y] = selectedTile;
+        saveGrid();
         
-        var pos = selectedTile;
-        
-        var pos_x = parseInt(pos%16);
-        var pos_y = parseInt(pos/16);
-        
-        // alert(pos_x + " " + pos_y);
-                
-        context.drawImage(document.getElementById("tile1"), pos_x*32, (pos_y*32), 32, 32, val_x*32, val_y*32, 32, 32);
     }
 }
 
@@ -59,7 +109,16 @@ function select(id)
     setAll(document.getElementsByClassName('tile'), "");
     document.getElementById('tile'+id).style.opacity = 1;
     selectedTile = id;
+        
+    saveChoice();
     // alert(id);
+}
+
+function reset()
+{
+    delete(localStorage['grid']);
+    delete(localStorage['selected']);
+    location.reload();
 }
 
 function drawSelector()
@@ -68,8 +127,6 @@ function drawSelector()
     document.getElementById('town').addEventListener("mousedown", setMouse, false);
     document.getElementById('town').addEventListener("mouseup", undoMouse, false);
     document.getElementById('town').addEventListener("mousemove", getPosition, false);
-
-
 
     for (var x=0; x<8; x++)
     {
@@ -97,6 +154,8 @@ function drawSelector()
     }
     
     document.getElementById('tile0').style.opacity = 1;
+    
+    loadData();
 
     
 
